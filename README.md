@@ -116,3 +116,127 @@ Sensitive records (IDs, academic certificates, compliance documents, medical/fin
 ## API (Wave 1 draft)
 > Draft endpoints for docs; implement in later waves.
 
+POST /api/upload
+Body: multipart/form-data { file }
+Resp: { cid: string, txHash?: string }
+
+GET /api/verify?cid=<cid>
+Resp: { exists: boolean, uploader?: string, timestamp?: number }
+
+
+**Notes**
+- Add rate limiting + auth (API keys) when going public.
+- For privacy, do not echo document contents—only verifiability data.
+
+---
+
+## Smart Contract Interface (MVP)
+```solidity
+interface IFilecoinVaultRegistry {
+    event Registered(bytes32 indexed cid, address indexed uploader, uint256 timestamp);
+
+    function registerCID(bytes32 cid) external; // emits Registered
+    function cidExists(bytes32 cid) external view returns (bool);
+    function getRecord(bytes32 cid) external view returns (address uploader, uint256 timestamp);
+}
+
+cid can be stored as bytes32/string depending on encoding choices.
+
+Future: ownership controls, revocation flags, batch registration, attester roles.
+
+Security & Privacy
+
+Encryption-first: store only encrypted payloads on Filecoin; keep keys off-chain.
+
+Principle of least knowledge: contract stores only minimal metadata.
+
+No secrets in repo: use .env for tokens/keys; never commit.
+
+PII Handling: document lawful basis & data retention policies.
+
+GTM & Cohort Alignment
+
+Product, not just demo: B2B SaaS for verifiable document storage/attestation.
+
+Target customers: universities, HR platforms, compliance/KYC vendors.
+
+Developer-first integration: clean REST APIs and SDKs.
+
+Ecosystem impact: standardize verifiable storage patterns on Filecoin.
+
+Wave Plan & Roadmap
+
+Wave 1 (this submission)
+
+Problem/Solution write-up, architecture diagrams, Notion page.
+
+README with module/API/contract drafts.
+
+Wave 2
+
+Working MVP: upload → Filecoin → on-chain registry.
+
+Minimal UI + demo video.
+
+Public test contract + example CIDs.
+
+Wave 3
+
+Permissions/auth, API keys, audit logs.
+
+Retrieval flows + basic payments/deal flow.
+
+SDK (TypeScript) for devs.
+
+Wave 4
+
+Role-based attestations, revocations, batch ops.
+
+Synapse/workflow automation; webhooks/notifications.
+
+Productionization (monitoring, SLOs).
+
+Local Setup (placeholder)
+git clone <repo-url>
+cd filecoinvault
+npm install
+cp .env.example .env   # add the values below
+npm run dev
+
+.env example
+
+PORT=3000
+FILECOIN_API_ENDPOINT=<your-endpoint>
+FILECOIN_API_TOKEN=<token>
+CHAIN_RPC_URL=<rpc>
+REGISTRY_CONTRACT_ADDRESS=<address-or-empty>
+PRIVATE_KEY=<never-commit>
+
+Repo Structure (suggested)
+filecoinvault/
+  README.md
+  docs/
+    diagrams/
+      filecoinvault-system-flow.jpeg
+      filecoinvault-components.jpeg
+      filecoinvault-sequence.jpeg
+    product/
+      problem.md
+      solution.md
+      gtm.md
+  backend/
+    src/
+    package.json
+  contracts/
+    src/
+    hardhat.config.ts
+  frontend/
+    ...
+
+Contribution
+
+PRs welcome. For features/bugs, open an Issue with context and repro steps.
+
+License
+
+MIT

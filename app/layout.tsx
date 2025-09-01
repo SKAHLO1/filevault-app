@@ -6,7 +6,7 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Filecoin Vault',
-  description: 'Encrypt and Store your Crednetials',
+  description: 'Encrypt and Store your Credentials',
 }
 
 export default function RootLayout({

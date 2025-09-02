@@ -1,8 +1,8 @@
 # FilecoinVault — Onchain Verifiable Data Vault
 
-A backend-powered service that lets users/dApps upload **encrypted documents** to **Filecoin**, then registers the resulting **CID** on-chain for public, tamper-evident verification. Third parties can verify authenticity without accessing private contents.
+A Full-stack service that lets users/dApps upload **encrypted documents** to **Filecoin**, then registers the resulting **CID** on-chain for public, tamper-evident verification. Third parties can verify authenticity without accessing private contents.
 
-> **Wave 1 focus:** product design + architecture docs (no fully working demo required yet).
+> **Wave 1 focus:** product design + prototype.
 
 ---
 
@@ -91,6 +91,7 @@ Sensitive records (IDs, academic certificates, compliance documents, medical/fin
 ---
 
 ## Tech Stack
+- **Frontend:** NExt.js/React.js. 
 - **Backend:** Node.js/Express (or Fastify)  
 - **Contracts:** Solidity (EVM) or FEVM-compatible  
 - **Storage:** Filecoin (IPFS-compatible client / SDK)  

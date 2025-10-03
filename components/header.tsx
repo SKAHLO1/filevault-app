@@ -37,6 +37,9 @@ export function Header() {
             <Link href="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
               Dashboard
             </Link>
+            <Link href="/setup" className="text-muted-foreground hover:text-foreground transition-colors">
+              Setup
+            </Link>
             <a href="#docs" className="text-muted-foreground hover:text-foreground transition-colors">
               Documentation
             </a>

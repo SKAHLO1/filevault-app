@@ -202,33 +202,58 @@ export function DashboardOverview() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {recentFiles.map((file, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Files className="h-8 w-8 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium text-foreground">{file.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {file.size} • {file.uploaded}
-                    </p>
-                    <p className="text-xs text-muted-foreground font-mono">CID: {file.cid.substring(0, 20)}...</p>
-                  </div>
-                </div>
+          {loading ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p className="text-sm">Loading files...</p>
+            </div>
+          ) : recentFiles.length > 0 ? (
+            <>
+              <div className="space-y-4">
+                {recentFiles.map((file, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Files className="h-8 w-8 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium text-foreground">{file.originalName}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {formatBytes(file.size)} • {new Date(file.uploadedAt).toLocaleDateString()}
+                        </p>
+                        {file.pieceCid && (
+                          <p className="text-xs text-muted-foreground font-mono">
+                            CID: {file.pieceCid.substring(0, 20)}...
+                          </p>
+                        )}
+                      </div>
+                    </div>
 
-                <div className="flex items-center gap-3">
-                  {getStatusBadge(file.status)}
-                  <Button variant="ghost" size="sm">
-                    <Download className="h-4 w-4" />
+                    <div className="flex items-center gap-3">
+                      {getStatusBadge(file.status)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {files.length > 3 && (
+                <div className="mt-4 text-center">
+                  <Button variant="outline" asChild>
+                    <Link href="/dashboard">View All Files</Link>
                   </Button>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4 text-center">
-            <Button variant="outline">View All Files</Button>
-          </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">
+              <AlertCircle className="h-12 w-12 mx-auto mb-3 opacity-20" />
+              <p className="text-sm mb-2">No files uploaded yet</p>
+              <p className="text-xs mb-4">Upload your first encrypted file to get started</p>
+              <Button asChild>
+                <Link href="/#upload">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Files
+                </Link>
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

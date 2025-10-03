@@ -55,53 +55,13 @@ export function FileManager() {
       if (response.ok) {
         const data = await response.json()
         setFiles(data.files || [])
+      } else {
+        console.error("Failed to fetch files:", response.status)
+        setFiles([])
       }
     } catch (error) {
       console.error("Failed to fetch files:", error)
-      setFiles([
-        {
-          id: "1",
-          originalName: "passport-scan.pdf",
-          type: "application/pdf",
-          size: 2457600,
-          cid: "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG",
-          datasetId: "0x1234567890abcdef1234567890abcdef12345678",
-          uploadedAt: "2024-01-15T10:30:00Z",
-          expiresAt: "2025-01-15T10:30:00Z",
-          status: "active",
-          storageProviders: ["f01234", "f05678", "f09012"],
-          replicationFactor: 3,
-          encrypted: true,
-        },
-        {
-          id: "2",
-          originalName: "medical-records.pdf",
-          type: "application/pdf",
-          size: 1887436,
-          cid: "QmPChd2hVbrJ6bfo3WBcTW4iZnpHm8TEzWkLHmLpXhF32r",
-          datasetId: "0xabcdef1234567890abcdef1234567890abcdef12",
-          uploadedAt: "2024-01-14T15:45:00Z",
-          expiresAt: "2025-01-14T15:45:00Z",
-          status: "active",
-          storageProviders: ["f01234", "f05678"],
-          replicationFactor: 2,
-          encrypted: true,
-        },
-        {
-          id: "3",
-          originalName: "tax-documents.zip",
-          type: "application/zip",
-          size: 5452595,
-          cid: "QmRf22bZar3WKmojipms22B6WewAqIt8VXriFV8XmeAoaF",
-          datasetId: "0x567890abcdef1234567890abcdef1234567890ab",
-          uploadedAt: "2024-01-12T09:15:00Z",
-          expiresAt: "2025-01-12T09:15:00Z",
-          status: "pending",
-          storageProviders: ["f01234"],
-          replicationFactor: 3,
-          encrypted: true,
-        },
-      ])
+      setFiles([])
     } finally {
       setLoading(false)
     }

@@ -58,16 +58,22 @@ export class FilecoinSynapseService {
   }
 
   async uploadFile(fileData: Buffer): Promise<{ pieceCid: string; pieceIds: string[] }> {
+    console.log('[Synapse] Starting upload...')
     await this.ensureInitialized()
 
+    console.log(`[Synapse] Running preflight check for ${fileData.length} bytes...`)
     const preflight = await this.storageContext!.preflightUpload(fileData.length)
 
+    console.log('[Synapse] Preflight result:', JSON.stringify(preflight, null, 2))
+
     if (!preflight.allowanceCheck.sufficient) {
-      throw new Error(`Insufficient allowances: ${preflight.allowanceCheck.message}`)
+      console.error('[Synapse] Insufficient allowances:', preflight.allowanceCheck.message)
+      throw new Error(`Insufficient allowances: ${preflight.allowanceCheck.message}. Please visit /setup to configure payments.`)
     }
 
     let pieceIds: string[] = []
 
+    console.log('[Synapse] Uploading to storage provider...')
     const uploadResult = await this.storageContext!.upload(fileData, {
       onPieceConfirmed: (confirmedPieceIds: string[]) => {
         console.log('✓ Piece addition confirmed on-chain!')
@@ -75,6 +81,8 @@ export class FilecoinSynapseService {
         pieceIds = confirmedPieceIds
       },
     })
+
+    console.log('[Synapse] Upload complete:', uploadResult.pieceCid)
 
     return {
       pieceCid: uploadResult.pieceCid,

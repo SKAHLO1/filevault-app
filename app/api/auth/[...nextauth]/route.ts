@@ -53,15 +53,22 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.address = user.address
+        token.id = user.id
       }
       return token
     },
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.sub!
+        session.user.id = token.sub || token.id as string
         session.user.address = token.address as string
       }
       return session
+    },
+    async redirect({ url, baseUrl }) {
+      // After signin, redirect to homepage
+      if (url.startsWith(baseUrl)) return url
+      else if (url.startsWith("/")) return baseUrl + url
+      return baseUrl
     },
   },
   pages: {

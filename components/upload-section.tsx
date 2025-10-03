@@ -162,9 +162,9 @@ export function UploadSection() {
                           <Badge variant="secondary" className="text-xs">
                             {uploadFile.type}
                           </Badge>
-                          {uploadFile.cid && (
+                          {uploadFile.pieceCid && (
                             <Badge variant="outline" className="text-xs">
-                              CID: {uploadFile.cid.substring(0, 8)}...
+                              Piece CID: {uploadFile.pieceCid.substring(0, 8)}...
                             </Badge>
                           )}
                         </div>

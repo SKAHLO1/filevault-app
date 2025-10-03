@@ -45,37 +45,6 @@ const handler = NextAuth({
         }
       },
     }),
-    CredentialsProvider({
-      id: "credentials",
-      name: "Email & Password",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        try {
-          if (!credentials?.email || !credentials?.password) {
-            return null
-          }
-
-          // In a real app, verify against your database
-          // For demo purposes, accept any email/password combination
-          if (credentials.email && credentials.password.length >= 6) {
-            return {
-              id: credentials.email,
-              name: credentials.email.split("@")[0],
-              email: credentials.email,
-              address: null,
-            }
-          }
-
-          return null
-        } catch (error) {
-          console.error("Credentials auth error:", error)
-          return null
-        }
-      },
-    }),
   ],
   session: {
     strategy: "jwt",

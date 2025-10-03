@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
-import { FilecoinClient } from "@/lib/filecoin-client"
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,10 +8,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const filecoinClient = new FilecoinClient()
-
-    const files = await filecoinClient.getUserFiles(session.user.id)
-    const storageProviders = await filecoinClient.getAvailableStorageProviders()
+    const files: any[] = []
+    const storageProviders: string[] = []
 
     // Calculate metrics
     const totalStorage = files.reduce((sum, file) => sum + file.size / (1024 * 1024 * 1024), 0) // Convert to GB

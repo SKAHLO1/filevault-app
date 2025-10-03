@@ -279,18 +279,18 @@ export function FileManager() {
                   </TableCell>
                   <TableCell>{formatFileSize(file.size)}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{formatDate(file.uploadedAt)}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{formatDate(file.expiresAt)}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{file.expiresAt ? formatDate(file.expiresAt) : "N/A"}</TableCell>
                   <TableCell>{getStatusBadge(file.status)}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      <span className="text-sm">{file.storageProviders.length}</span>
+                      <span className="text-sm">{file.storageProviders?.length || 0}</span>
                       <Badge variant="outline" className="text-xs">
-                        {file.replicationFactor}x
+                        {file.replicationFactor || 1}x
                       </Badge>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <code className="text-xs bg-muted px-2 py-1 rounded">{file.cid.substring(0, 12)}...</code>
+                    <code className="text-xs bg-muted px-2 py-1 rounded">{(file.pieceCid || file.cid || "N/A").substring(0, 12)}...</code>
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>

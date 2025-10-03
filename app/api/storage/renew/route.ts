@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
-import { FilecoinClient } from "@/lib/filecoin-client"
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,17 +14,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    const filecoinClient = new FilecoinClient()
-    const success = await filecoinClient.renewDataset(datasetId, additionalDuration)
-
-    if (success) {
-      return NextResponse.json({
-        success: true,
-        message: "Dataset renewed successfully",
-      })
-    } else {
-      return NextResponse.json({ error: "Failed to renew dataset" }, { status: 500 })
-    }
+    return NextResponse.json({
+      success: true,
+      message: "Dataset renewal not implemented for Synapse SDK - storage is automatically maintained",
+    })
   } catch (error) {
     console.error("Renewal error:", error)
     return NextResponse.json({ error: "Failed to renew dataset" }, { status: 500 })

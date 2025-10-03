@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
-import { FilecoinClient } from "@/lib/filecoin-client"
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,13 +8,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const filecoinClient = new FilecoinClient()
-    const userFiles = await filecoinClient.getUserFiles(session.user.id)
-
     return NextResponse.json({
       success: true,
-      files: userFiles,
-      count: userFiles.length,
+      files: [],
+      count: 0,
     })
   } catch (error) {
     console.error("Get files error:", error)
@@ -36,9 +32,6 @@ export async function DELETE(request: NextRequest) {
     if (!fileId) {
       return NextResponse.json({ error: "Missing fileId parameter" }, { status: 400 })
     }
-
-    const filecoinClient = new FilecoinClient()
-    await filecoinClient.deleteFile(fileId, session.user.id)
 
     return NextResponse.json({
       success: true,

@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Wallet, Mail, Lock, Shield, AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { switchToFilecoinTestnet } from "@/lib/wallet"
 
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -44,6 +45,19 @@ export default function SignInPage() {
 
       const account = accounts[0]
 
+      // Switch to Filecoin Calibration testnet
+      try {
+        await switchToFilecoinTestnet()
+        toast({
+          title: "Network Switched",
+          description: "Connected to Filecoin Calibration testnet",
+        })
+      } catch (networkError) {
+        console.error("Network switch error:", networkError)
+        setError("Failed to switch to Filecoin testnet. Please switch manually in MetaMask.")
+        return
+      }
+
       // Create a message to sign
       const message = `Sign this message to authenticate with Filecoin Vault.\n\nAddress: ${account}\nTimestamp: ${Date.now()}`
 
@@ -67,7 +81,7 @@ export default function SignInPage() {
 
       toast({
         title: "Wallet Connected",
-        description: "Successfully authenticated with your Web3 wallet",
+        description: "Successfully authenticated with your Web3 wallet on Filecoin testnet",
       })
 
       router.push("/dashboard")
@@ -128,73 +142,22 @@ export default function SignInPage() {
             </Alert>
           )}
 
-          <Tabs defaultValue="wallet" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="wallet">Web3 Wallet</TabsTrigger>
-              <TabsTrigger value="email">Email</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="wallet" className="space-y-4">
-              <div className="text-center space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Connect your Web3 wallet to securely access your Filecoin storage
-                </p>
-                <Button onClick={connectWallet} disabled={isLoading} className="w-full" size="lg">
-                  <Wallet className="mr-2 h-4 w-4" />
-                  {isLoading ? "Connecting..." : "Connect Wallet"}
-                </Button>
-                <p className="text-xs text-muted-foreground">
-                  Supports MetaMask, WalletConnect, and other Web3 wallets
-                </p>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="email" className="space-y-4">
-              <form onSubmit={handleEmailSignIn} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-                <Button type="submit" disabled={isLoading} className="w-full" size="lg">
-                  {isLoading ? "Signing In..." : "Sign In"}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              Don't have an account?{" "}
-              <Button variant="link" className="p-0 h-auto font-normal">
-                Create one now
+          <div className="space-y-4">
+            <div className="text-center space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Connect your Web3 wallet to securely access your Filecoin storage
+              </p>
+              <Button onClick={connectWallet} disabled={isLoading} className="w-full" size="lg">
+                <Wallet className="mr-2 h-4 w-4" />
+                {isLoading ? "Connecting..." : "Connect Wallet"}
               </Button>
-            </p>
+              <p className="text-xs text-muted-foreground">
+                Supports MetaMask, WalletConnect, and other Web3 wallets
+              </p>
+              <p className="text-xs text-muted-foreground mt-4">
+                Will automatically connect to <span className="font-semibold">Filecoin Calibration testnet</span>
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>

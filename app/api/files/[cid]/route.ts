@@ -1,39 +1,39 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { FilecoinClient } from "@/lib/filecoin-client"
+import { filecoinSynapse } from "@/lib/filecoin-synapse"
 import { decryptFile } from "@/lib/encryption"
 
 export async function GET(request: NextRequest, { params }: { params: { cid: string } }) {
   try {
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get("userId")
     const encryptionKey = searchParams.get("encryptionKey")
+    const fileName = searchParams.get("fileName") || "download"
+    const fileType = searchParams.get("fileType") || "application/octet-stream"
 
-    if (!userId || !encryptionKey) {
-      return NextResponse.json({ error: "Missing userId or encryptionKey parameter" }, { status: 400 })
+    if (!encryptionKey) {
+      return NextResponse.json({ error: "Missing encryptionKey parameter" }, { status: 400 })
     }
 
-    const filecoinClient = new FilecoinClient()
+    const downloadedData = await filecoinSynapse.downloadFile(params.cid)
 
-    // Retrieve file from Filecoin
-    const fileData = await filecoinClient.retrieveFile(params.cid, userId)
-
-    if (!fileData) {
-      return NextResponse.json({ error: "File not found or access denied" }, { status: 404 })
+    if (!downloadedData) {
+      return NextResponse.json({ error: "File not found" }, { status: 404 })
     }
 
-    // Decrypt the file
-    const decryptedData = await decryptFile(fileData.encryptedContent, encryptionKey)
+    const encryptedBuffer = Buffer.from(downloadedData)
+    const decryptedData = await decryptFile(encryptedBuffer, encryptionKey)
 
-    // Return the decrypted file
     return new NextResponse(decryptedData, {
       headers: {
-        "Content-Type": fileData.metadata.type,
-        "Content-Disposition": `attachment; filename="${fileData.metadata.originalName}"`,
+        "Content-Type": fileType,
+        "Content-Disposition": `attachment; filename="${fileName}"`,
         "Content-Length": decryptedData.length.toString(),
       },
     })
   } catch (error) {
     console.error("Retrieve file error:", error)
-    return NextResponse.json({ error: "Failed to retrieve file from Filecoin" }, { status: 500 })
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to retrieve file from Filecoin" },
+      { status: 500 }
+    )
   }
 }

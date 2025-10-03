@@ -1,7 +1,29 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Shield, Database, Lock } from "lucide-react"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 export function HeroSection() {
+  const { data: session } = useSession()
+  const router = useRouter()
+
+  const handleStartUploading = () => {
+    if (session) {
+      router.push("/dashboard")
+    } else {
+      router.push("/auth/signin")
+    }
+  }
+
+  const scrollToUpload = () => {
+    const uploadSection = document.getElementById("upload")
+    if (uploadSection) {
+      uploadSection.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
   return (
     <section className="py-20 lg:py-32">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,11 +38,15 @@ export function HeroSection() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-              Start Uploading
+            <Button 
+              size="lg" 
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              onClick={handleStartUploading}
+            >
+              {session ? "Go to Dashboard" : "Start Uploading"}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button size="lg" variant="outline">
+            <Button size="lg" variant="outline" onClick={scrollToUpload}>
               View Documentation
             </Button>
           </div>

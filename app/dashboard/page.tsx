@@ -1,6 +1,7 @@
 "use client"
 
 import dynamic from 'next/dynamic'
+import { useState } from 'react';
 
 const DashboardLayout = dynamic(
   () => import('@/components/dashboard-layout').then(mod => ({ default: mod.DashboardLayout })),

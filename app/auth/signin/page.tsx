@@ -84,11 +84,11 @@ export default function SignInPage() {
         description: "Successfully authenticated with your Web3 wallet on Filecoin testnet",
       })
 
-      // Small delay to ensure session is set before redirect
+      // Redirect to dashboard after successful authentication
       setTimeout(() => {
-        router.push("/")
+        router.push("/dashboard")
         router.refresh()
-      }, 500)
+      }, 1000)
     } catch (error) {
       console.error("Wallet connection error:", error)
       setError("Failed to connect wallet")

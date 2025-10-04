@@ -15,6 +15,7 @@ interface UploadedFile {
   status: "uploading" | "completed" | "error"
   progress: number
   type: string
+  pieceCid?: string
   cid?: string
   encryptionKey?: string
 }

@@ -65,10 +65,13 @@ const handler = NextAuth({
       return session
     },
     async redirect({ url, baseUrl }) {
-      // After signin, redirect to homepage
+      // After signin, redirect to dashboard
+      if (url === baseUrl + "/" || url === baseUrl) {
+        return baseUrl + "/dashboard"
+      }
       if (url.startsWith(baseUrl)) return url
       else if (url.startsWith("/")) return baseUrl + url
-      return baseUrl
+      return baseUrl + "/dashboard"
     },
   },
   pages: {

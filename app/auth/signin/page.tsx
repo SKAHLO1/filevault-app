@@ -24,29 +24,32 @@ export default function SignInPage() {
   const { toast } = useToast()
 
   const connectWallet = async () => {
-    try {
-      setIsLoading(true)
-      setError("")
+    setIsLoading(true)
+    setError("")
 
+    try {
+      console.log("Starting wallet connection...")
+      
       if (!window.ethereum) {
-        setError("Please install MetaMask or another Web3 wallet")
-        return
+        throw new Error("Please install MetaMask or another Web3 wallet")
       }
 
       // Request account access
+      console.log("Requesting accounts...")
       const accounts = await window.ethereum.request({
         method: "eth_requestAccounts",
       })
 
       if (!accounts || accounts.length === 0) {
-        setError("No accounts found")
-        return
+        throw new Error("No accounts found")
       }
 
       const account = accounts[0]
+      console.log("Account connected:", account)
 
       // Switch to Filecoin Calibration testnet
       try {
+        console.log("Switching to Filecoin testnet...")
         await switchToFilecoinTestnet()
         toast({
           title: "Network Switched",
@@ -54,29 +57,39 @@ export default function SignInPage() {
         })
       } catch (networkError) {
         console.error("Network switch error:", networkError)
-        setError("Failed to switch to Filecoin testnet. Please switch manually in MetaMask.")
-        return
+        throw new Error("Failed to switch to Filecoin testnet. Please switch manually in MetaMask.")
       }
 
       // Create a message to sign
       const message = `Sign this message to authenticate with Filecoin Vault.\n\nAddress: ${account}\nTimestamp: ${Date.now()}`
+      console.log("Message to sign:", message)
 
       // Request signature
+      console.log("Requesting signature...")
       const signature = await window.ethereum.request({
         method: "personal_sign",
         params: [message, account],
       })
+      console.log("Signature received:", signature)
 
       // Sign in with NextAuth
+      console.log("Signing in with NextAuth...")
       const result = await signIn("ethereum", {
         message,
         signature,
         redirect: false,
       })
 
+      console.log("NextAuth result:", result)
+
       if (result?.error) {
-        setError("Authentication failed")
-        return
+        console.error("NextAuth error:", result.error)
+        throw new Error(`Authentication failed: ${result.error}`)
+      }
+
+      if (!result?.ok) {
+        console.error("NextAuth not ok:", result)
+        throw new Error("Authentication failed - session not created")
       }
 
       toast({
@@ -84,15 +97,14 @@ export default function SignInPage() {
         description: "Successfully authenticated with your Web3 wallet on Filecoin testnet",
       })
 
+      console.log("Redirecting to dashboard...")
       // Redirect to dashboard after successful authentication
-      setTimeout(() => {
-        router.push("/dashboard")
-        router.refresh()
-      }, 1000)
-    } catch (error) {
+      router.push("/dashboard")
+      router.refresh()
+      
+    } catch (error: any) {
       console.error("Wallet connection error:", error)
-      setError("Failed to connect wallet")
-    } finally {
+      setError(error.message || "Failed to connect wallet")
       setIsLoading(false)
     }
   }

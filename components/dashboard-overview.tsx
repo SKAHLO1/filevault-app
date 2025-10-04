@@ -1,12 +1,43 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Files, HardDrive, Shield, TrendingUp, Upload, Download, Clock, CheckCircle, AlertCircle } from "lucide-react"
+import Link from "next/link"
 
 export function DashboardOverview() {
+  const [files, setFiles] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchRecentFiles()
+  }, [])
+
+  const fetchRecentFiles = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch("/api/files")
+      if (response.ok) {
+        const data = await response.json()
+        setFiles((data.files || []).slice(0, 3)) // Get only 3 most recent files
+      }
+    } catch (error) {
+      console.error("Failed to fetch files:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const formatBytes = (bytes: number) => {
+    if (bytes === 0) return "0 Bytes"
+    const k = 1024
+    const sizes = ["Bytes", "KB", "MB", "GB"]
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+  }
   const stats = [
     {
       title: "Total Files",
@@ -38,29 +69,7 @@ export function DashboardOverview() {
     },
   ]
 
-  const recentFiles = [
-    {
-      name: "passport-scan.pdf",
-      size: "2.4 MB",
-      uploaded: "2 hours ago",
-      status: "stored",
-      cid: "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG",
-    },
-    {
-      name: "medical-records.pdf",
-      size: "1.8 MB",
-      uploaded: "1 day ago",
-      status: "stored",
-      cid: "QmPChd2hVbrJ6bfo3WBcTW4iZnpHm8TEzWkLHmLpXhF32r",
-    },
-    {
-      name: "tax-documents.zip",
-      size: "5.2 MB",
-      uploaded: "3 days ago",
-      status: "pending",
-      cid: "QmRf22bZar3WKmojipms22B6WewAqIt8VXriFV8XmeAoaF",
-    },
-  ]
+
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -204,19 +213,20 @@ export function DashboardOverview() {
         <CardContent>
           {loading ? (
             <div className="text-center py-8 text-muted-foreground">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
               <p className="text-sm">Loading files...</p>
             </div>
-          ) : recentFiles.length > 0 ? (
+          ) : files.length > 0 ? (
             <>
               <div className="space-y-4">
-                {recentFiles.map((file, index) => (
+                {files.map((file: any, index: number) => (
                   <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center gap-3">
                       <Files className="h-8 w-8 text-muted-foreground" />
                       <div>
-                        <p className="font-medium text-foreground">{file.originalName}</p>
+                        <p className="font-medium text-foreground">{file.originalName || file.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          {formatBytes(file.size)} • {new Date(file.uploadedAt).toLocaleDateString()}
+                          {formatBytes(file.size)} • {new Date(file.uploadedAt || file.uploaded).toLocaleDateString()}
                         </p>
                         {file.pieceCid && (
                           <p className="text-xs text-muted-foreground font-mono">
@@ -233,13 +243,11 @@ export function DashboardOverview() {
                 ))}
               </div>
 
-              {files.length > 3 && (
-                <div className="mt-4 text-center">
-                  <Button variant="outline" asChild>
-                    <Link href="/dashboard">View All Files</Link>
-                  </Button>
-                </div>
-              )}
+              <div className="mt-4 text-center">
+                <Button variant="outline" asChild>
+                  <Link href="/dashboard">View All Files</Link>
+                </Button>
+              </div>
             </>
           ) : (
             <div className="text-center py-12 text-muted-foreground">
